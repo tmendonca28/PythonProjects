@@ -27,11 +27,33 @@ def decode_review(text):
 
 # Pad each of the reviews
 train_data = keras.preprocessing.sequence.pad_sequences(train_data,
-                                                        value=word_index["PAD"],
+                                                        value=word_index["<PAD>"],
                                                         padding="post",
                                                         maxlen=256)
 test_data = keras.preprocessing.sequence.pad_sequences(test_data,
-                                                        value=word_index["PAD"],
+                                                        value=word_index["<PAD>"],
                                                         padding="post",
                                                         maxlen=256)
+
+vocab_size = 10000
+
+model = keras.Sequential()
+model.add(keras.layers.Embedding(vocab_size, 16))
+model.add(keras.layers.GlobalAveragePooling1D())
+model.add(keras.layers.Dense(16, activation=tf.nn.relu))
+model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
+
+# model.summary()
+
+model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["acc"])
+
+x_val = train_data[:10000]
+partial_x_train = train_data[10000:]
+
+y_val = train_labels[:10000]
+partial_y_train = train_data[10000:]
+
+results = model.evaluate(test_data, test_labels)
+
+print(results)
 
